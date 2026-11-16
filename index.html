@@ -1,92 +1,1333 @@
-<!-- ==================================================
- SAO-SURIN ROAD MAP 2570
- Budget Display Enhancement
- หน่วยงบประมาณ: ล้านบาท
- รักษาข้อมูลเดิมทั้งหมด
-================================================== -->
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>SAO-SURIN ROAD MAP 2570</title>
+
+<link rel="stylesheet"
+href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+<style>
+* { box-sizing:border-box; }
+
+body {
+  margin:0;
+  font-family:Tahoma,Arial,sans-serif;
+  background:#f1f5f9;
+  color:#172b45;
+}
+
+header {
+  background:linear-gradient(120deg,#102b52,#17629b);
+  color:white;
+  padding:24px;
+  text-align:center;
+}
+
+header h1 { margin:0 0 10px; }
+header p { margin:6px 0; }
+
+.toolbar {
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  padding:15px;
+  background:white;
+}
+
+button {
+  padding:10px 15px;
+  border:0;
+  border-radius:8px;
+  background:#17629b;
+  color:white;
+  cursor:pointer;
+  font:inherit;
+}
+
+button:hover { background:#0d426c; }
+
+button.secondary { background:#64748b; }
+button.danger { background:#dc2626; }
+button.success { background:#15803d; }
+
+input,select,textarea {
+  padding:10px;
+  border:1px solid #cbd5e1;
+  border-radius:7px;
+  font:inherit;
+  max-width:100%;
+}
+
+textarea {
+  min-height:90px;
+  resize:vertical;
+}
+
+.dashboard {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:12px;
+  padding:15px;
+}
+
+.card {
+  background:white;
+  padding:18px;
+  border-radius:12px;
+  box-shadow:0 2px 6px #0001;
+}
+
+.card strong {
+  display:block;
+  font-size:25px;
+  color:#17629b;
+  margin-top:8px;
+}
+
+.layout {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 350px;
+  gap:12px;
+  padding:15px;
+}
+
+#map {
+  height:650px;
+  border-radius:12px;
+}
+
+.panel {
+  background:white;
+  padding:15px;
+  border-radius:12px;
+  max-height:650px;
+  overflow:auto;
+}
+
+.project {
+  padding:12px;
+  border-bottom:1px solid #ddd;
+}
+
+.project h4 { margin:5px 0; }
+
+.badge {
+  display:inline-block;
+  background:#e2e8f0;
+  padding:5px 8px;
+  border-radius:7px;
+  font-size:12px;
+}
+
+.modal {
+  display:none;
+  position:fixed;
+  inset:0;
+  background:#0009;
+  z-index:3000;
+  overflow:auto;
+  padding:20px;
+}
+
+.modal.show { display:block; }
+
+.dialog {
+  background:white;
+  max-width:900px;
+  margin:auto;
+  border-radius:12px;
+  padding:22px;
+}
+
+.formgrid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.field {
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+}
+
+.wide { grid-column:1/-1; }
+
+.section {
+  grid-column:1/-1;
+  background:#eaf3fc;
+  padding:12px;
+  border-left:5px solid #17629b;
+  font-weight:bold;
+  margin-top:12px;
+}
+
+.gallery {
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:10px;
+}
+
+.photo-box {
+  border:1px solid #ddd;
+  border-radius:8px;
+  padding:6px;
+  max-width:160px;
+}
+
+.photo-box img {
+  width:145px;
+  height:110px;
+  object-fit:cover;
+  border-radius:6px;
+}
+
+.photo-box button {
+  width:100%;
+  margin-top:5px;
+}
+
+.file-row {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  padding:8px;
+  border-bottom:1px solid #ddd;
+}
+
+.summary {
+  background:white;
+  margin:15px;
+  padding:18px;
+  border-radius:12px;
+  white-space:pre-wrap;
+}
+
+.notice {
+  background:#fff7dc;
+  padding:12px 18px;
+  font-size:13px;
+}
+
+.leaflet-popup-content {
+  max-height:360px;
+  overflow:auto;
+}
+
+.leaflet-popup-content img {
+  max-width:220px;
+  max-height:150px;
+}
+
+@media(max-width:800px) {
+  .layout { grid-template-columns:1fr; }
+  .formgrid { grid-template-columns:1fr; }
+  #map { height:480px; }
+  .panel { max-height:400px; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>🛣️ SAO-SURIN ROAD MAP 2570</h1>
+<p>ระบบแผนที่ตรวจสอบ ติดตาม และให้คำแนะนำโครงการก่อสร้างถนนชำรุด</p>
+<p>สำนักตรวจเงินแผ่นดินจังหวัดสุรินทร์</p>
+<small>ถนนที่ก่อสร้างแล้ว ต้องปลอดภัย ได้มาตรฐาน และประชาชนใช้ประโยชน์ได้จริง</small>
+</header>
+
+<div class="toolbar">
+
+<button id="addBtn">➕ เพิ่มโครงการ</button>
+
+<input id="search" placeholder="ค้นหาโครงการ / อปท. / อำเภอ"
+style="flex:1;min-width:180px">
+
+<select id="filter">
+<option value="">ทุกสถานะ</option>
+<option>วางแผนการตรวจสอบ</option>
+<option>ตรวจสอบเบื้องต้น</option>
+<option>ตรวจสอบ</option>
+<option>ตรวจสอบแล้วเสร็จ</option>
+<option>ติดตามผลการตรวจสอบ</option>
+<option>ให้คำแนะนำแก้ไข</option>
+<option>ดำเนินการแก้ไขแล้วเสร็จบางส่วน</option>
+<option>ดำเนินการแก้ไขแล้วเสร็จ 100%</option>
+</select>
+
+<button id="exportBtn" class="success">💾 สำรอง JSON</button>
+<button id="importBtn" class="secondary">📂 นำเข้า JSON</button>
+
+<input type="file" id="importFile" accept=".json,application/json" hidden>
+
+</div>
+
+<div class="notice">
+⚠️ ข้อมูลโครงการจัดเก็บในเบราว์เซอร์ของเครื่องที่ใช้งาน
+โปรดสำรองข้อมูล JSON เป็นประจำ โดยเฉพาะก่อนอัปเดตเว็บไซต์
+</div>
+
+<div class="dashboard">
+<div class="card">จำนวนโครงการ<strong id="totalProjects">0</strong></div>
+<div class="card">งบประมาณรวม<strong id="totalBudget">0.00 ล้านบาท</strong></div>
+<div class="card">ตรวจสอบแล้วเสร็จ<strong id="totalAudited">0</strong></div>
+<div class="card">แก้ไขแล้วเสร็จบางส่วน<strong id="totalPartial">0</strong></div>
+<div class="card">แก้ไขแล้วเสร็จ 100%<strong id="totalCompleted">0</strong></div>
+</div>
+
+<div class="summary" id="summary">
+📊 สรุปข้อมูลโครงการ
+</div>
+
+<div class="layout">
+<div id="map"></div>
+<div class="panel">
+<h3>📋 รายการโครงการ</h3>
+<div id="projectList"></div>
+</div>
+</div>
+
+<div class="modal" id="modal">
+<div class="dialog">
+
+<h2 id="formTitle">เพิ่มโครงการ</h2>
+
+<form id="projectForm">
+
+<div class="formgrid">
+
+<div class="section">1. ข้อมูลโครงการ</div>
+
+<label class="field wide">
+ชื่อโครงการ
+<input name="name" required>
+</label>
+
+<label class="field">
+หมู่บ้าน
+<input name="village">
+</label>
+
+<label class="field">
+ตำบล
+<input name="tambon">
+</label>
+
+<label class="field">
+อำเภอ
+<input name="district">
+</label>
+
+<label class="field">
+หน่วยงาน / อปท.
+<input name="agency">
+</label>
+
+<label class="field">
+ปีงบประมาณ
+<input name="year" type="number">
+</label>
+
+<label class="field">
+งบประมาณ (ล้านบาท)
+<input name="budget" type="number" min="0" step="any">
+</label>
+
+<label class="field">
+ประเภทถนน
+<select name="type">
+<option>คอนกรีตเสริมเหล็ก</option>
+<option>ลาดยางแอสฟัลต์</option>
+<option>ลูกรัง</option>
+<option>อื่น ๆ</option>
+</select>
+</label>
+
+<label class="field">
+ลักษณะความชำรุด
+<select name="damage">
+<option>แตกร้าว</option>
+<option>หลุมบ่อ</option>
+<option>ทรุดตัว</option>
+<option>ผิวทางเสียหาย</option>
+<option>ระบายน้ำไม่ดี</option>
+<option>อื่น ๆ</option>
+</select>
+</label>
+
+<label class="field">
+สถานะการตรวจสอบ
+<select name="status">
+<option>วางแผนการตรวจสอบ</option>
+<option>ตรวจสอบเบื้องต้น</option>
+<option>ตรวจสอบ</option>
+<option>ตรวจสอบแล้วเสร็จ</option>
+<option>ติดตามผลการตรวจสอบ</option>
+<option>ให้คำแนะนำแก้ไข</option>
+<option>ดำเนินการแก้ไขแล้วเสร็จบางส่วน</option>
+<option>ดำเนินการแก้ไขแล้วเสร็จ 100%</option>
+</select>
+</label>
+
+<label class="field">
+วันที่สำรวจ
+<input name="surveyDate" type="date">
+</label>
+
+<div class="section">2. พิกัดและขนาดถนน</div>
+
+<label class="field">
+Latitude
+<input name="lat" type="number" step="any" required>
+</label>
+
+<label class="field">
+Longitude
+<input name="lng" type="number" step="any" required>
+</label>
+
+<label class="field">
+ความยาวถนน (เมตร)
+<input name="length" type="number" step="any">
+</label>
+
+<label class="field">
+ความกว้างถนน (เมตร)
+<input name="width" type="number" step="any">
+</label>
+
+<div class="section">3. ข้อมูลสัญญา</div>
+
+<label class="field">
+เลขที่สัญญา
+<input name="contractNo">
+</label>
+
+<label class="field">
+วันที่ทำสัญญา
+<input name="contractDate" type="date">
+</label>
+
+<label class="field">
+ผู้รับจ้าง
+<input name="contractor">
+</label>
+
+<label class="field">
+วงเงินสัญญา (ล้านบาท)
+<input name="contractBudget" type="number" min="0" step="any">
+</label>
+
+<label class="field">
+วันเริ่มสัญญา
+<input name="startDate" type="date">
+</label>
+
+<label class="field">
+วันสิ้นสุดสัญญา
+<input name="endDate" type="date">
+</label>
+
+<label class="field">
+ความก้าวหน้าการก่อสร้าง (%)
+<input name="progress" type="number" min="0" max="100">
+</label>
+
+<label class="field">
+ความก้าวหน้าการแก้ไข (%)
+<input name="repairProgress" type="number" min="0" max="100">
+</label>
+
+<label class="field">
+ผู้ควบคุมงาน
+<input name="supervisor">
+</label>
+
+<label class="field">
+เจ้าหน้าที่ผู้ตรวจสอบ
+<input name="officer">
+</label>
+
+<div class="section">4. ผลการตรวจสอบ</div>
+
+<label class="field wide">
+รายละเอียดโครงการ
+<textarea name="detail"></textarea>
+</label>
+
+<label class="field wide">
+ข้อเท็จจริงที่ตรวจพบ
+<textarea name="findings"></textarea>
+</label>
+
+<label class="field wide">
+สรุปผลการตรวจสอบ
+<textarea name="auditSummary"></textarea>
+</label>
+
+<label class="field wide">
+ข้อเสนอแนะในการแก้ไข
+<textarea name="recommendation"></textarea>
+</label>
+
+<label class="field wide">
+ผลการดำเนินการแก้ไข
+<textarea name="actionResult"></textarea>
+</label>
+
+<label class="field">
+วันที่ตรวจสอบ
+<input name="auditDate" type="date">
+</label>
+
+<label class="field">
+วันที่ติดตามผล
+<input name="followupDate" type="date">
+</label>
+
+<label class="field wide">
+สรุปข้อมูลโครงการสำหรับเผยแพร่
+<textarea name="publicSummary"></textarea>
+</label>
+
+<div class="section">5. รูปภาพและเอกสารหลักฐาน</div>
+
+<label class="field wide">
+เพิ่มรูปภาพ
+<input id="photoInput" type="file" accept="image/*" multiple>
+</label>
+
+<div class="field wide">
+<div id="photoGallery" class="gallery"></div>
+</div>
+
+<label class="field wide">
+เพิ่มไฟล์เอกสาร
+<input id="fileInput" type="file" multiple>
+</label>
+
+<div class="field wide">
+<div id="fileList"></div>
+</div>
+
+</div>
+
+<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:20px">
+
+<button type="submit" class="success" id="saveBtn">
+💾 บันทึกข้อมูล
+</button>
+
+<button type="button" id="deleteBtn" class="danger">
+🗑️ ลบโครงการ
+</button>
+
+<button type="button" id="cancelBtn" class="secondary">
+ยกเลิก
+</button>
+
+</div>
+
+</form>
+</div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
 (function () {
-    "use strict";
+"use strict";
 
-    const STORAGE_KEY = "sao_surin_road_map_v1";
+/* ==========================================
+   ฐานข้อมูลเดิม ห้ามเปลี่ยนชื่อ
+========================================== */
 
-    // แปลงบาทเป็นล้านบาท
-    function bahtToMillion(value) {
-        const amount = Number(value);
+const STORAGE_KEY = "sao_surin_road_map_v1";
 
-        if (!Number.isFinite(amount)) {
-            return "0.00";
-        }
+const $ = id => document.getElementById(id);
 
-        return (amount / 1000000).toLocaleString(
-            "th-TH",
-            {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 4
-            }
-        );
-    }
+const STATUS = [
+ "วางแผนการตรวจสอบ",
+ "ตรวจสอบเบื้องต้น",
+ "ตรวจสอบ",
+ "ตรวจสอบแล้วเสร็จ",
+ "ติดตามผลการตรวจสอบ",
+ "ให้คำแนะนำแก้ไข",
+ "ดำเนินการแก้ไขแล้วเสร็จบางส่วน",
+ "ดำเนินการแก้ไขแล้วเสร็จ 100%"
+];
 
-    // แปลงล้านบาทเป็นบาท
-    function millionToBaht(value) {
-        const amount = Number(value);
+const LEGACY_STATUS = {
+ "อยู่ระหว่างวางแผนเพื่อตรวจสอบและให้คำแนะนำ":
+   "วางแผนการตรวจสอบ",
+ "อยู่ระหว่างตรวจสอบ":
+   "ตรวจสอบ",
+ "แจ้งข้อเสนอแนะแล้ว":
+   "ให้คำแนะนำแก้ไข",
+ "อยู่ระหว่างแก้ไข":
+   "ดำเนินการแก้ไขแล้วเสร็จบางส่วน",
+ "แก้ไขแล้ว":
+   "ดำเนินการแก้ไขแล้วเสร็จ 100%",
+ "ติดตามผล":
+   "ติดตามผลการตรวจสอบ"
+};
 
-        if (!Number.isFinite(amount)) {
-            return 0;
-        }
+let records = [];
+let editId = null;
+let photos = [];
+let attachments = [];
+let mediaPending = 0;
+let markersById = new Map();
 
-        return Math.round(amount * 1000000);
-    }
+/* ==========================================
+   อ่านข้อมูลเดิม
+========================================== */
 
-    // แสดงงบประมาณ
-    function formatBudget(value) {
-        return bahtToMillion(value) + " ล้านบาท";
-    }
+try {
+ const raw = localStorage.getItem(STORAGE_KEY);
+ const parsed = raw ? JSON.parse(raw) : [];
 
-    // สำรองข้อมูลเดิมโดยไม่เปลี่ยนแปลง
-    function backupExistingData() {
-        const existingData =
-            localStorage.getItem(STORAGE_KEY);
+ records = Array.isArray(parsed) ? parsed : [];
+} catch (error) {
+ console.error("อ่านข้อมูลเดิมไม่สำเร็จ", error);
+ alert("ไม่สามารถอ่านข้อมูลเดิมได้ กรุณาอย่าล้างข้อมูลเว็บไซต์");
+}
 
-        if (!existingData) {
-            alert("ยังไม่พบข้อมูลโครงการในเบราว์เซอร์นี้");
-            return;
-        }
+/* ==========================================
+   เครื่องมือพื้นฐาน
+========================================== */
 
-        const blob = new Blob(
-            [existingData],
-            { type: "application/json;charset=utf-8" }
-        );
+function escapeHTML(value) {
+ return String(value ?? "")
+  .replaceAll("&", "&amp;")
+  .replaceAll("<", "&lt;")
+  .replaceAll(">", "&gt;")
+  .replaceAll('"', "&quot;")
+  .replaceAll("'", "&#39;");
+}
 
-        const url = URL.createObjectURL(blob);
+function formatNumber(value, digits = 2) {
+ return Number(value || 0).toLocaleString("th-TH", {
+  minimumFractionDigits: digits,
+  maximumFractionDigits: digits
+ });
+}
 
-        const a = document.createElement("a");
+function bahtToMillion(value) {
+ return Number(value || 0) / 1000000;
+}
 
-        a.href = url;
-        a.download =
-            "SAO_SURIN_ROAD_MAP_BACKUP_" +
-            new Date().toISOString().slice(0, 10) +
-            ".json";
+function millionToBaht(value) {
+ return Math.round(Number(value || 0) * 1000000);
+}
 
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
+function budgetText(value) {
+ return formatNumber(bahtToMillion(value)) + " ล้านบาท";
+}
 
-        URL.revokeObjectURL(url);
-    }
+function normalizeStatus(value) {
+ return LEGACY_STATUS[value] || value || STATUS[0];
+}
 
-    // เปิดให้โค้ดระบบเดิมเรียกใช้งาน
-    window.SAO_ROAD_BUDGET = {
-        bahtToMillion,
-        millionToBaht,
-        formatBudget,
-        backupExistingData
-    };
+function makeId() {
+ return crypto.randomUUID
+  ? crypto.randomUUID()
+  : String(Date.now()) + Math.random();
+}
 
-    console.log(
-        "SAO-SURIN ROAD MAP 2570: Budget utilities loaded."
+function saveData(next) {
+ try {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+  records = next;
+  return true;
+ } catch (error) {
+  console.error(error);
+  alert(
+   "บันทึกไม่สำเร็จ อาจเกิดจากพื้นที่จัดเก็บเต็ม\n" +
+   "ข้อมูลเดิมยังไม่ถูกเขียนทับ\n" +
+   "กรุณาสำรอง JSON และลดขนาดรูปภาพหรือไฟล์แนบ"
+  );
+  return false;
+ }
+}
+
+/* ==========================================
+   แผนที่
+========================================== */
+
+const map = L.map("map").setView([14.88, 103.49], 9);
+
+L.tileLayer(
+ "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+ {
+  attribution:"© OpenStreetMap contributors",
+  maxZoom:19
+ }
+).addTo(map);
+
+const markerLayer = L.layerGroup().addTo(map);
+
+function validCoordinates(r) {
+ const lat = Number(r.lat);
+ const lng = Number(r.lng);
+
+ return Number.isFinite(lat) &&
+        Number.isFinite(lng) &&
+        lat >= -90 && lat <= 90 &&
+        lng >= -180 && lng <= 180;
+}
+
+/* ==========================================
+   แสดงข้อมูล
+========================================== */
+
+function filteredRecords() {
+ const search = $("search").value.trim().toLowerCase();
+ const status = $("filter").value;
+
+ return records.filter(r => {
+  const text = [
+   r.name,
+   r.agency,
+   r.district,
+   r.tambon,
+   r.village
+  ].join(" ").toLowerCase();
+
+  return text.includes(search) &&
+   (!status || normalizeStatus(r.status) === status);
+ });
+}
+
+function render() {
+
+ markerLayer.clearLayers();
+ markersById.clear();
+
+ const totalBudget = records.reduce(
+  (sum,r) => sum + Number(r.budget || 0),0
+ );
+
+ $("totalProjects").textContent = records.length;
+ $("totalBudget").textContent = budgetText(totalBudget);
+
+ $("totalAudited").textContent =
+  records.filter(r =>
+   normalizeStatus(r.status) === "ตรวจสอบแล้วเสร็จ"
+  ).length;
+
+ $("totalPartial").textContent =
+  records.filter(r =>
+   normalizeStatus(r.status) ===
+   "ดำเนินการแก้ไขแล้วเสร็จบางส่วน"
+  ).length;
+
+ $("totalCompleted").textContent =
+  records.filter(r =>
+   normalizeStatus(r.status) ===
+   "ดำเนินการแก้ไขแล้วเสร็จ 100%"
+  ).length;
+
+ const completedAudit = records.filter(r =>
+  String(r.auditSummary || "").trim()
+ ).length;
+
+ $("summary").textContent =
+  "📊 สรุปผลข้อมูลโครงการ\n" +
+  "จำนวนโครงการทั้งหมด: " + records.length + " โครงการ\n" +
+  "งบประมาณรวม: " + budgetText(totalBudget) + "\n" +
+  "มีสรุปผลการตรวจสอบ: " + completedAudit + " โครงการ\n" +
+  "แก้ไขแล้วเสร็จ 100%: " +
+  records.filter(r =>
+   normalizeStatus(r.status) ===
+   "ดำเนินการแก้ไขแล้วเสร็จ 100%"
+  ).length + " โครงการ";
+
+ const list = $("projectList");
+ list.innerHTML = "";
+
+ filteredRecords().forEach(r => {
+
+  const item = document.createElement("div");
+  item.className = "project";
+
+  item.innerHTML = `
+   <h4>${escapeHTML(r.name)}</h4>
+   <div>${escapeHTML(r.agency || "")}</div>
+   <div>อำเภอ ${escapeHTML(r.district || "")}</div>
+   <div>งบประมาณ ${budgetText(r.budget)}</div>
+   <div class="badge">${escapeHTML(normalizeStatus(r.status))}</div>
+   <br><br>
+   <button type="button" class="edit-project">✏️ แก้ไข</button>
+   <button type="button" class="view-project secondary">📍 ดูหมุด</button>
+  `;
+
+  item.querySelector(".edit-project").onclick =
+   () => openForm(r.id);
+
+  item.querySelector(".view-project").onclick = () => {
+   const marker = markersById.get(String(r.id));
+   if (marker) {
+    map.setView(marker.getLatLng(), 15);
+    marker.openPopup();
+   }
+  };
+
+  list.appendChild(item);
+
+  if (!validCoordinates(r)) return;
+
+  const marker = L.marker(
+   [Number(r.lat), Number(r.lng)],
+   {draggable:true}
+  );
+
+  const mainPhoto = r.photo ||
+   (Array.isArray(r.photos) ? r.photos[0] : "");
+
+  const photoURL = typeof mainPhoto === "string"
+   ? mainPhoto
+   : mainPhoto?.data || mainPhoto?.url || "";
+
+  const popup = document.createElement("div");
+
+  popup.style.minWidth = "220px";
+
+  const title = document.createElement("b");
+  title.textContent = r.name || "โครงการถนน";
+  popup.appendChild(title);
+
+  const info = document.createElement("div");
+  info.innerHTML = `
+   <div>อำเภอ ${escapeHTML(r.district || "")}</div>
+   <div>งบประมาณ ${budgetText(r.budget)}</div>
+   <div>${escapeHTML(normalizeStatus(r.status))}</div>
+   <div><b>สรุปผลการตรวจสอบ:</b>
+   ${escapeHTML(r.auditSummary || "ยังไม่มีข้อมูล")}</div>
+   <div><b>ผลการแก้ไข:</b>
+   ${escapeHTML(r.actionResult || "ยังไม่มีข้อมูล")}</div>
+  `;
+  popup.appendChild(info);
+
+  if (photoURL && (
+   photoURL.startsWith("data:image/") ||
+   photoURL.startsWith("https://") ||
+   photoURL.startsWith("http://")
+  )) {
+   const img = document.createElement("img");
+   img.src = photoURL;
+   img.alt = "ภาพโครงการ";
+   img.style.display = "block";
+   img.style.margin = "8px 0";
+   popup.appendChild(img);
+  }
+
+  const editButton = document.createElement("button");
+  editButton.type = "button";
+  editButton.textContent = "✏️ แก้ไขรายละเอียด";
+  editButton.style.marginTop = "8px";
+
+  editButton.addEventListener("click", event => {
+   event.preventDefault();
+   event.stopPropagation();
+   openForm(r.id);
+  });
+
+  popup.appendChild(editButton);
+
+  marker.bindPopup(popup, {
+   maxWidth:300,
+   autoPan:true
+  });
+
+  marker.on("dragend", () => {
+   const point = marker.getLatLng();
+
+   if (!confirm("ยืนยันย้ายตำแหน่งหมุดโครงการนี้?")) {
+    marker.setLatLng([Number(r.lat), Number(r.lng)]);
+    return;
+   }
+
+   const next = records.map(x =>
+    String(x.id) === String(r.id)
+     ? {...x,lat:point.lat,lng:point.lng}
+     : x
+   );
+
+   if (saveData(next)) render();
+   else marker.setLatLng([Number(r.lat),Number(r.lng)]);
+  });
+
+  marker.addTo(markerLayer);
+  markersById.set(String(r.id),marker);
+
+ });
+}
+
+/* ==========================================
+   ระบบรูปภาพและไฟล์แนบ
+========================================== */
+
+function getPhotoURL(photo) {
+ if (typeof photo === "string") return photo;
+ return photo?.data || photo?.url || "";
+}
+
+function refreshPhotos() {
+ const gallery = $("photoGallery");
+ gallery.innerHTML = "";
+
+ photos.forEach((photo,index) => {
+  const box = document.createElement("div");
+  box.className = "photo-box";
+
+  const img = document.createElement("img");
+  img.src = getPhotoURL(photo);
+  img.alt = "รูปภาพที่ " + (index + 1);
+
+  const remove = document.createElement("button");
+  remove.type = "button";
+  remove.className = "danger";
+  remove.textContent = "ลบรูปภาพ";
+
+  remove.onclick = () => {
+   if (!confirm("ลบรูปภาพนี้?")) return;
+   photos.splice(index,1);
+   refreshPhotos();
+  };
+
+  box.append(img,remove);
+  gallery.appendChild(box);
+ });
+}
+
+function refreshFiles() {
+ const list = $("fileList");
+ list.innerHTML = "";
+
+ attachments.forEach((file,index) => {
+  const row = document.createElement("div");
+  row.className = "file-row";
+
+  const name = document.createElement("span");
+  name.textContent = file.name || "เอกสารแนบ";
+
+  const remove = document.createElement("button");
+  remove.type = "button";
+  remove.className = "danger";
+  remove.textContent = "ลบ";
+
+  remove.onclick = () => {
+   if (!confirm("ลบไฟล์นี้?")) return;
+   attachments.splice(index,1);
+   refreshFiles();
+  };
+
+  row.append(name,remove);
+  list.appendChild(row);
+ });
+}
+
+function readFile(file) {
+ return new Promise((resolve,reject) => {
+  const reader = new FileReader();
+  reader.onload = () => resolve(reader.result);
+  reader.onerror = () => reject(reader.error);
+  reader.readAsDataURL(file);
+ });
+}
+
+function compressImage(file) {
+ return new Promise((resolve,reject) => {
+
+  const img = new Image();
+  const url = URL.createObjectURL(file);
+
+  img.onload = () => {
+   try {
+    const maxSize = 1200;
+    const ratio = Math.min(
+     1,
+     maxSize / Math.max(img.width,img.height)
     );
+
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(img.width * ratio);
+    canvas.height = Math.round(img.height * ratio);
+
+    canvas.getContext("2d").drawImage(
+     img,0,0,canvas.width,canvas.height
+    );
+
+    resolve(canvas.toDataURL("image/jpeg",0.65));
+   } catch (error) {
+    reject(error);
+   } finally {
+    URL.revokeObjectURL(url);
+   }
+  };
+
+  img.onerror = () => {
+   URL.revokeObjectURL(url);
+   reject(new Error("ไม่สามารถอ่านรูปภาพได้"));
+  };
+
+  img.src = url;
+ });
+}
+
+$("photoInput").addEventListener("change",async event => {
+ const files = [...event.target.files];
+ mediaPending++;
+ $("saveBtn").disabled = true;
+
+ try {
+  for (const file of files) {
+   if (!file.type.startsWith("image/")) continue;
+
+   const data = await compressImage(file);
+   photos.push(data);
+  }
+
+  refreshPhotos();
+ } catch (error) {
+  alert("เพิ่มรูปภาพไม่สำเร็จ: " + error.message);
+ } finally {
+  mediaPending--;
+  $("saveBtn").disabled = mediaPending > 0;
+  event.target.value = "";
+ }
+});
+
+$("fileInput").addEventListener("change",async event => {
+ const files = [...event.target.files];
+ mediaPending++;
+ $("saveBtn").disabled = true;
+
+ try {
+  for (const file of files) {
+
+   if (file.size > 1024 * 1024) {
+    alert("ไฟล์ " + file.name + " มีขนาดเกิน 1 MB");
+    continue;
+   }
+
+   const data = await readFile(file);
+
+   attachments.push({
+    name:file.name,
+    type:file.type,
+    size:file.size,
+    data:data
+   });
+  }
+
+  refreshFiles();
+ } catch (error) {
+  alert("เพิ่มเอกสารไม่สำเร็จ: " + error.message);
+ } finally {
+  mediaPending--;
+  $("saveBtn").disabled = mediaPending > 0;
+  event.target.value = "";
+ }
+});
+
+/* ==========================================
+   เพิ่มและแก้ไขข้อมูลโครงการ
+========================================== */
+
+function openForm(id = null) {
+
+ if (mediaPending) {
+  alert("กรุณารอประมวลผลรูปภาพให้เสร็จก่อน");
+  return;
+ }
+
+ const record = records.find(r =>
+  String(r.id) === String(id)
+ );
+
+ editId = record ? record.id : null;
+
+ $("projectForm").reset();
+
+ photos = record
+  ? [
+     ...(record.photo ? [record.photo] : []),
+     ...(Array.isArray(record.photos) ? record.photos : [])
+    ]
+  : [];
+
+ attachments = record
+  ? [...(Array.isArray(record.attachments)
+     ? record.attachments : [])]
+  : [];
+
+ if (record) {
+  for (const [key,value] of Object.entries(record)) {
+
+   const input = $("projectForm").elements.namedItem(key);
+
+   if (!input || typeof value === "object") continue;
+
+   if (key === "budget" || key === "contractBudget") {
+    input.value = bahtToMillion(value);
+   } else if (key === "status") {
+    input.value = normalizeStatus(value);
+   } else {
+    input.value = value ?? "";
+   }
+  }
+ } else {
+  $("projectForm").elements.namedItem("lat").value = 14.88;
+  $("projectForm").elements.namedItem("lng").value = 103.49;
+  $("projectForm").elements.namedItem("year").value = 2570;
+ }
+
+ refreshPhotos();
+ refreshFiles();
+
+ $("formTitle").textContent =
+  record ? "✏️ แก้ไขข้อมูลโครงการ" : "➕ เพิ่มโครงการ";
+
+ $("deleteBtn").style.display =
+  record ? "inline-block" : "none";
+
+ $("modal").classList.add("show");
+}
+
+function closeForm() {
+ if (mediaPending) {
+  alert("กรุณารอประมวลผลไฟล์ให้เสร็จก่อน");
+  return;
+ }
+
+ $("modal").classList.remove("show");
+ editId = null;
+}
+
+/* ==========================================
+   บันทึกข้อมูล
+========================================== */
+
+$("projectForm").addEventListener("submit",event => {
+ event.preventDefault();
+
+ if (mediaPending) {
+  alert("กรุณารอประมวลผลรูปภาพหรือไฟล์แนบ");
+  return;
+ }
+
+ const form = new FormData(event.target);
+ const values = Object.fromEntries(form.entries());
+
+ const old = records.find(r =>
+  String(r.id) === String(editId)
+ );
+
+ const lat = Number(values.lat);
+ const lng = Number(values.lng);
+
+ if (!Number.isFinite(lat) ||
+     !Number.isFinite(lng) ||
+     lat < -90 || lat > 90 ||
+     lng < -180 || lng > 180) {
+  alert("กรุณาตรวจสอบพิกัด GPS");
+  return;
+ }
+
+ const newRecord = {
+  ...(old || {}),
+  ...values,
+
+  id:old?.id || makeId(),
+
+  budget:millionToBaht(values.budget),
+  contractBudget:millionToBaht(values.contractBudget),
+
+  lat:lat,
+  lng:lng,
+
+  status:normalizeStatus(values.status),
+
+  photo:photos.length ? getPhotoURL(photos[0]) : "",
+  photos:photos.slice(1),
+
+  attachments:[...attachments],
+
+  updatedAt:new Date().toISOString()
+ };
+
+ const next = old
+  ? records.map(r =>
+     String(r.id) === String(old.id) ? newRecord : r
+    )
+  : [...records,newRecord];
+
+ if (!saveData(next)) return;
+
+ closeForm();
+ render();
+
+ map.setView([lat,lng],14);
+});
+
+/* ==========================================
+   ลบโครงการ
+========================================== */
+
+$("deleteBtn").onclick = () => {
+
+ if (!editId) return;
+
+ if (!confirm(
+  "ยืนยันลบโครงการนี้?\n" +
+  "การลบจะลบข้อมูล รูปภาพ และเอกสารของโครงการ"
+ )) return;
+
+ const next = records.filter(r =>
+  String(r.id) !== String(editId)
+ );
+
+ if (!saveData(next)) return;
+
+ closeForm();
+ render();
+};
+
+/* ==========================================
+   สำรองข้อมูล JSON
+========================================== */
+
+$("exportBtn").onclick = () => {
+
+ const data = {
+  system:"SAO-SURIN ROAD MAP",
+  version:1,
+  exportedAt:new Date().toISOString(),
+  projects:records
+ };
+
+ const blob = new Blob(
+  [JSON.stringify(data,null,2)],
+  {type:"application/json;charset=utf-8"}
+ );
+
+ const url = URL.createObjectURL(blob);
+ const a = document.createElement("a");
+
+ a.href = url;
+ a.download =
+  "SAO-SURIN-ROAD-MAP-" +
+  new Date().toISOString().slice(0,10) +
+  ".json";
+
+ document.body.appendChild(a);
+ a.click();
+ a.remove();
+
+ setTimeout(() => URL.revokeObjectURL(url),1000);
+};
+
+/* ==========================================
+   นำเข้าข้อมูล JSON โดยไม่ลบข้อมูลเดิม
+========================================== */
+
+$("importBtn").onclick = () => $("importFile").click();
+
+$("importFile").addEventListener("change",async event => {
+
+ const file = event.target.files[0];
+ if (!file) return;
+
+ try {
+  const text = await file.text();
+  const parsed = JSON.parse(text);
+
+  const imported = Array.isArray(parsed)
+   ? parsed
+   : parsed.projects;
+
+  if (!Array.isArray(imported)) {
+   throw new Error("ไม่พบรายการโครงการในไฟล์");
+  }
+
+  if (!confirm(
+   "นำเข้า " + imported.length +
+   " โครงการ โดยไม่ลบข้อมูลเดิม ใช่หรือไม่?"
+  )) return;
+
+  const merged = [...records];
+
+  imported.forEach(item => {
+
+   if (!item || typeof item !== "object") return;
+
+   const incoming = {
+    ...item,
+    id:item.id || makeId()
+   };
+
+   const index = merged.findIndex(r =>
+    String(r.id) === String(incoming.id)
+   );
+
+   if (index < 0) {
+    merged.push(incoming);
+   } else {
+    // เก็บข้อมูลเดิมเมื่อพบรหัสซ้ำ
+    merged[index] = {
+     ...incoming,
+     ...merged[index]
+    };
+   }
+  });
+
+  if (!saveData(merged)) return;
+
+  render();
+
+  alert("นำเข้าข้อมูลเรียบร้อยแล้ว");
+
+ } catch (error) {
+  alert("นำเข้าไม่สำเร็จ: " + error.message);
+ } finally {
+  event.target.value = "";
+ }
+});
+
+/* ==========================================
+   ปุ่มและเหตุการณ์
+========================================== */
+
+$("addBtn").onclick = () => openForm();
+
+$("cancelBtn").onclick = closeForm;
+
+$("search").oninput = render;
+
+$("filter").onchange = render;
+
+/* ==========================================
+   เริ่มต้นระบบ
+========================================== */
+
+render();
+
+console.log(
+ "SAO-SURIN ROAD MAP 2570 initialized",
+ records.length,
+ "projects"
+);
 
 })();
 </script>
+
+</body>
+</html>
