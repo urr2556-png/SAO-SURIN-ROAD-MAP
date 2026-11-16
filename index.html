@@ -1,1 +1,92 @@
+<!-- ==================================================
+ SAO-SURIN ROAD MAP 2570
+ Budget Display Enhancement
+ หน่วยงบประมาณ: ล้านบาท
+ รักษาข้อมูลเดิมทั้งหมด
+================================================== -->
 
+<script>
+(function () {
+    "use strict";
+
+    const STORAGE_KEY = "sao_surin_road_map_v1";
+
+    // แปลงบาทเป็นล้านบาท
+    function bahtToMillion(value) {
+        const amount = Number(value);
+
+        if (!Number.isFinite(amount)) {
+            return "0.00";
+        }
+
+        return (amount / 1000000).toLocaleString(
+            "th-TH",
+            {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 4
+            }
+        );
+    }
+
+    // แปลงล้านบาทเป็นบาท
+    function millionToBaht(value) {
+        const amount = Number(value);
+
+        if (!Number.isFinite(amount)) {
+            return 0;
+        }
+
+        return Math.round(amount * 1000000);
+    }
+
+    // แสดงงบประมาณ
+    function formatBudget(value) {
+        return bahtToMillion(value) + " ล้านบาท";
+    }
+
+    // สำรองข้อมูลเดิมโดยไม่เปลี่ยนแปลง
+    function backupExistingData() {
+        const existingData =
+            localStorage.getItem(STORAGE_KEY);
+
+        if (!existingData) {
+            alert("ยังไม่พบข้อมูลโครงการในเบราว์เซอร์นี้");
+            return;
+        }
+
+        const blob = new Blob(
+            [existingData],
+            { type: "application/json;charset=utf-8" }
+        );
+
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+
+        a.href = url;
+        a.download =
+            "SAO_SURIN_ROAD_MAP_BACKUP_" +
+            new Date().toISOString().slice(0, 10) +
+            ".json";
+
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+
+        URL.revokeObjectURL(url);
+    }
+
+    // เปิดให้โค้ดระบบเดิมเรียกใช้งาน
+    window.SAO_ROAD_BUDGET = {
+        bahtToMillion,
+        millionToBaht,
+        formatBudget,
+        backupExistingData
+    };
+
+    console.log(
+        "SAO-SURIN ROAD MAP 2570: Budget utilities loaded."
+    );
+
+})();
+</script>
